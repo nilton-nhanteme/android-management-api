@@ -19,7 +19,7 @@ app.use(express.json());
 
 // 3. Registro de Rotas Globais
 // Todas as nossas URLs de API serão prefixadas com api/v1
-app.use('api/v1', apiRouter);
+app.use('/api/v1', apiRouter);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
