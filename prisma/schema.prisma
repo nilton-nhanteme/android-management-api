@@ -1,0 +1,54 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// 1. Tabela de Tenants (Seus Clientes SaaS / Empresas)
+model Company {
+  id                 String    @id @default(uuid())
+  name               String
+  amapiEnterpriseId  String?   @unique @map("amapi_enterprise_id") // ID que o Google nos gera
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  policies           Policy[]
+  devices            Device[]
+
+  @@map("Companies") // Nome real da tabela no PostgreSQL
+}
+
+// 2. Tabela de Políticas de Segurança
+model Policy {
+  id             String   @id @default(uuid())
+  companyId       String   @map("company_id")
+  name           String   // Ex: "Perfil Motorista"
+  amapiPolicyId  String   @unique @map("amapi_policy_id") // Ex: enterprises/LC.../policies/motorista
+  settings       Json     // Armazena as restrições JSON de forma flexível e robusta
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  company        Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  devices        Device[]
+
+  @@map("policies")
+}
+
+// 3. Tabela de Dispositivos (Celulares Gerenciados)
+model Device {
+  id             String   @id @default(uuid())
+  tenantId       String   @map("tenant_id")
+  policyId       String?  @map("policy_id")
+  amapiDeviceId  String   @unique @map("amapi_device_id") // Ex: enterprises/LC.../devices/0a1b...
+  state          String   // Ex: ACTIVE, DISABLED, ENROLLING
+  hardwareModel  String   @map("hardware_model") // Ex: Samsung Galaxy A54
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  tenant         Company   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  policy         Policy?  @relation(fields: [policyId], references: [id], onDelete: SetNull)
+
+  @@map("devices")
+}
