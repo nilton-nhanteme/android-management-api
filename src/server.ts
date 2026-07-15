@@ -5,6 +5,7 @@ import path from "path";
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsDoc from 'swagger-jsdoc';
 import { fileURLToPath } from "url";
+import { generateSwaggerDoc } from './swagger.js';
 
 // 1. Carregar as variavés de ambiente do arquivo .env e criar instância express e portas
 dotenv.config();
@@ -38,14 +39,10 @@ const swaggerOptions: swaggerJsDoc.Options = {
       },
     ],
   },
-  apis: [
-    path.resolve(__dirname, './routes.ts'),
-    path.resolve(__dirname, './route.js'),
-  ]
 };
 
-const swaggerDocs = swaggerJsDoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+const swaggerDocument = generateSwaggerDoc();
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // 4. Tratamento de rotas inexistentes (404)
 app.use((request, response) => {
@@ -61,10 +58,12 @@ app.listen(PORT, () => {
   console.log(`                  Porta: ${PORT}                `)
   console.log(`   SWAGGER: http://localhost:${PORT}/api-docs`   )
   console.log('================================================')
-}).on('error', (err: any) => {
+}).on('error', (err: NodeJS.ErrnoException) => {
   if (err.code ==='EADDRINUSE') {
       console.error(`ERRO: A porta ${PORT} já está sendo utilizada por outro serviço.`)
   } else {
     console.error(`Erro inesperado ao iniciar o servidor:`, err);
   }
 });
+
+export { PORT };

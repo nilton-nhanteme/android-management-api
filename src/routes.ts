@@ -5,8 +5,8 @@ import { Router, type Request, type Response } from "express";
 
 const apiRouter = Router();
 
-// Rota de monitoramento e verificação de disponibilidade online
-apiRouter.get("/health", (request: Request, response: Response) => {
+apiRouter.get("/users", (request: Request, response: Response) => {
+  // Retorna os dados que seguem o formato do UserSchema
   response.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
