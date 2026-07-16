@@ -6,6 +6,6 @@ import { companyRouter } from './modules/company/company.routes.js'; // Importa 
 
 const apiRouter = Router();
 
-apiRouter.post('/companies', companyRouter)
+apiRouter.use('/companies', companyRouter)
 
 export { apiRouter };
